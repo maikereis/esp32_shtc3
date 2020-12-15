@@ -8,6 +8,7 @@
 #define I2C_MASTER_FREQ_HZ 100000
 
 const char *TAG = "MAIN";
+uint8_t calc_crc8(uint8_t *data, size_t len);
 
 void app_main(void)
 {
@@ -66,5 +67,25 @@ void app_main(void)
     T = ((((data[0] << 8) + data[1]) * 175) / 65536.0) - 45;
 
     H = ((((data[3] << 8) + data[4]) * 100) / 65536.0);
-    ESP_LOGI(TAG, "Temperature: %f, Humidade: %f", T, H);
+
+    ESP_LOGI(TAG, "Temperature: %f, Humidade: %f, calc CRC: 0x%02x, read CRC: 0x%02x", T, H, calc_crc8(data,2), data[2]);
+}
+
+
+const uint8_t g_polynom = 0x31;
+
+uint8_t calc_crc8(uint8_t *data, size_t len)
+{
+    uint8_t crc = 0xff;
+    size_t i, j;
+    for (i = 0; i < len; i++) {
+        crc ^= data[i];
+        for (j = 0; j < 8; j++) {
+            if ((crc & 0x80) != 0)
+                crc = (uint8_t)((crc << 1) ^ 0x31);
+            else
+                crc <<= 1;
+        }
+    }
+    return crc;
 }
