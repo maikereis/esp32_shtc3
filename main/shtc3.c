@@ -32,9 +32,27 @@ esp_err_t wakeup_sensor(uint8_t addr)
     i2c_master_stop(cmd);
     esp_err_t err = i2c_master_cmd_begin(I2C_NUM_0, cmd, 2);
     i2c_cmd_link_delete(cmd);
+    if(err)
+        ESP_LOGI(TAG, "%s", esp_err_to_name(err));
+    return err;
+}
+esp_err_t get_ID_sensor(uint8_t addr)
+{
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, addr << 1 | I2C_MASTER_WRITE, true);
+    i2c_master_write_byte(cmd, 0xEF, true);
+    i2c_master_write_byte(cmd, 0xC8, true);
+    i2c_master_stop(cmd);
+    esp_err_t err = i2c_master_cmd_begin(I2C_NUM_0, cmd, 2);
+    i2c_cmd_link_delete(cmd);
+
+    if(err)
+        ESP_LOGI(TAG, "%s", esp_err_to_name(err));
 
     return err;
 }
+
 
 esp_err_t soft_reset_sensor(uint8_t addr)
 {

@@ -25,6 +25,7 @@ void init_sensor(i2c_mode_t mode, gpio_num_t sda, gpio_num_t scl, uint32_t freq)
 esp_err_t wakeup_sensor(uint8_t addr);
 esp_err_t read_out(uint8_t addr, uint16_t read_mode, float *temp, float *hum);
 esp_err_t sleep_sensor(uint8_t addr);
+esp_err_t get_ID_sensor(uint8_t addr);
 
 
 
